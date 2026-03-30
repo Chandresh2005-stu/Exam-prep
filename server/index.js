@@ -18,7 +18,9 @@ mongoose.connect(URL)
   .catch((er) => {
     console.log(` Error: ${er}`);
   });
-
+app.get("/", (req, res) => {
+  res.send(" Examprep Backend is Running");
+});
 // ================= API ROUTES =================
 app.use('/api/examinee', require('./routes/examineeRoute'));
 app.use('/api/admin', require('./routes/adminRoute'));
