@@ -7,10 +7,18 @@ const app = express();
 
 // ✅ CORS FIX (IMPORTANT)
 app.use(cors({
-  origin: "https://exam-prep-kappa.vercel.app",
+  origin: function (origin, callback) {
+    if (!origin || origin.includes("vercel.app")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
+
+app.options('*', cors());
 
 app.use(express.json());
 

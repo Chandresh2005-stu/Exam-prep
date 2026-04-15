@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import axios from 'axios';
 
-
 const GetExam = () => {
   const { id: examId } = useParams();
   const [exam, setExam] = useState(null);
@@ -12,11 +11,13 @@ const GetExam = () => {
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState(null);
-const email = localStorage.getItem('userEmail');
+
+  const email = localStorage.getItem('userEmail');
+
   useEffect(() => {
     const fetchExam = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/exams/exam/${examId}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/exams/exam/${examId}`);
         const { exam: examData, questions: questionData } = res.data;
         setExam(examData);
         setQuestions(questionData);
@@ -58,23 +59,23 @@ const email = localStorage.getItem('userEmail');
   };
 
   const handleSubmit = async () => {
-        if (submitted) return; // Prevent multiple submissions
+    if (submitted) return;
 
-        try {
-            const res = await axios.post('http://localhost:5000/api/exams/submit-exam', {
-                examId,
-                answers,
-                email,
-            });
-            setResult(res.data);
-            setSubmitted(true);
-            alert("Your Exam was submitted successfully. Result will be declared soon.");
-            window.location.href = '/user/profile';
-        } catch (err) {
-            console.error('Error submitting exam:', err);
-            setError(err.response?.data?.error || 'Failed to submit exam');
-        }
-    };
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/exams/submit-exam`, {
+        examId,
+        answers,
+        email,
+      });
+      setResult(res.data);
+      setSubmitted(true);
+      alert("Your Exam was submitted successfully. Result will be declared soon.");
+      window.location.href = '/user/profile';
+    } catch (err) {
+      console.error('Error submitting exam:', err);
+      setError(err.response?.data?.error || 'Failed to submit exam');
+    }
+  };
 
   if (error) {
     return <div className="alert alert-danger m-4">{error}</div>;
@@ -117,66 +118,25 @@ const email = localStorage.getItem('userEmail');
             <div key={q._id} className="card mb-3">
               <div className="card-body">
                 <h5>Question {index + 1}: {q.question}</h5>
-                <div className="form-check">
-                  <input
-                    type="radio"
-                    name={`question-${q._id}`}
-                    value={q.optionA}
-                    checked={answers[q._id] === q.optionA}
-                    onChange={() => handleAnswerChange(q._id, q.optionA)}
-                    className="form-check-input"
-                    id={`optionA-${q._id}`}
-                    disabled={submitted}
-                  />
-                  <label className="form-check-label" htmlFor={`optionA-${q._id}`}>
-                    {q.optionA}
-                  </label>
-                </div>
-                <div className="form-check">
-                  <input
-                    type="radio"
-                    name={`question-${q._id}`}
-                    value={q.optionB}
-                    checked={answers[q._id] === q.optionB}
-                    onChange={() => handleAnswerChange(q._id, q.optionB)}
-                    className="form-check-input"
-                    id={`optionB-${q._id}`}
-                    disabled={submitted}
-                  />
-                  <label className="form-check-label" htmlFor={`optionB-${q._id}`}>
-                    {q.optionB}
-                  </label>
-                </div>
-                <div className="form-check">
-                  <input
-                    type="radio"
-                    name={`question-${q._id}`}
-                    value={q.optionC}
-                    checked={answers[q._id] === q.optionC}
-                    onChange={() => handleAnswerChange(q._id, q.optionC)}
-                    className="form-check-input"
-                    id={`optionC-${q._id}`}
-                    disabled={submitted}
-                  />
-                  <label className="form-check-label" htmlFor={`optionC-${q._id}`}>
-                    {q.optionC}
-                  </label>
-                </div>
-                <div className="form-check">
-                  <input
-                    type="radio"
-                    name={`question-${q._id}`}
-                    value={q.optionD}
-                    checked={answers[q._id] === q.optionD}
-                    onChange={() => handleAnswerChange(q._id, q.optionD)}
-                    className="form-check-input"
-                    id={`optionD-${q._id}`}
-                    disabled={submitted}
-                  />
-                  <label className="form-check-label" htmlFor={`optionD-${q._id}`}>
-                    {q.optionD}
-                  </label>
-                </div>
+
+                {['optionA','optionB','optionC','optionD'].map((opt) => (
+                  <div className="form-check" key={opt}>
+                    <input
+                      type="radio"
+                      name={`question-${q._id}`}
+                      value={q[opt]}
+                      checked={answers[q._id] === q[opt]}
+                      onChange={() => handleAnswerChange(q._id, q[opt])}
+                      className="form-check-input"
+                      id={`${opt}-${q._id}`}
+                      disabled={submitted}
+                    />
+                    <label className="form-check-label" htmlFor={`${opt}-${q._id}`}>
+                      {q[opt]}
+                    </label>
+                  </div>
+                ))}
+
               </div>
             </div>
           ))}

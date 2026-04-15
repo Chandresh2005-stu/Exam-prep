@@ -7,7 +7,7 @@ const Result = () => {
 
   const handlefetch = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/exams/examinee-result/${userId}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/exams/examinee-result/${userId}`);
       console.log("Fetched result:", res.data);
 
       setData(Array.isArray(res.data.message) ? res.data.message : []);

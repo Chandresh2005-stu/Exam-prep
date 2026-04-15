@@ -15,7 +15,7 @@ const Registration = () => {
   const[sessions,setSessions]=useState([]);
   const handlefetch=async()=>{
     try{
-      const res= await axios.get("http://localhost:5000/api/session");
+      const res= await axios.get(`${import.meta.env.VITE_API_URL}/api/session`);
       setSessions(res.data.data);
       //console.log();
     }
@@ -35,17 +35,17 @@ const Registration = () => {
   const handleSubmit=async(e)=>{
     e.preventDefault();
     try{
-      const res= await axios.post('http://localhost:5000/api/examinee',formData);
+      const res= await axios.post(`${import.meta.env.VITE_API_URL}/api/examinee`,formData);
       alert('Examinee Registered!');
       setFormData({
         name:'',
-    email:'',
-    number:'',
-    address:'',
-    password:'',
-    college:'',
-    qualification:'',
-    session:'',
+        email:'',
+        number:'',
+        address:'',
+        password:'',
+        college:'',
+        qualification:'',
+        session:'',
       });
     } catch(error){
       console.error('Submission error:',error);
@@ -167,4 +167,4 @@ const Registration = () => {
   );
 };
 
-export default Registration;``
+export default Registration;

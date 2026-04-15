@@ -2,45 +2,51 @@ import React from 'react'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import axios from 'axios'
+
 const ContactUs = () => {
-        const [formData, setFormData] = useState({
-            question: '',
-            email: localStorage.getItem('userEmail') || ''
+    const [formData, setFormData] = useState({
+        question: '',
+        email: localStorage.getItem('userEmail') || ''
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
         });
-        const handleChange = (e) => {
-            const { name, value } = e.target;
-            setFormData({
-                ...formData,
-                [name]: value
-            });
-    
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/message`, formData);
+            alert(response.data.message);
+            setFormData({ question: '', email: formData.email });
+        } catch (error) {
+            console.error('Error Sending Message:', error);
+            alert('Failed to send message');
         }
-        const handleSubmit = async (e) => {
-            e.preventDefault();
-            try {
-                const response = await axios.post('http://localhost:5000/api/message', formData);
-                alert(response.data.message);
-                setFormData({ question: '', email: formData.email });
-            } catch (error) {
-                console.error('Error Sending Message:', error);
-                alert('Failed to send message');
-            }
+    }
+
+    const [messages, setMessages] = useState([]);
+
+    const fetchMessages = async () => {
+        try {
+            const userId = localStorage.getItem('userId');
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/${userId}`);
+            setMessages(response.data.message);
+        } catch (error) {
+            console.error('error fetching messages:', error);
         }
-        const [messages, setMessages] = useState([]);
-        const fetchMessages = async () => {
-            try {
-                const userId = localStorage.getItem('userId');
-                const response = await axios.get(`http://localhost:5000/api/message/${userId}`);
-                setMessages(response.data.message);
-            } catch (error) {
-                cnsole.error('error fetching messages:', error);
-            }
-        }
-        useEffect(()=>{
-                fetchMessages();
-            },[])
+    }
+
+    useEffect(() => {
+        fetchMessages();
+    }, [])
+
     return (
-         <div>
+        <div>
             <h4 className='mx-3'>Contact Us</h4>
             <div className="container-fluid">
                 <div className="row">
@@ -48,7 +54,7 @@ const ContactUs = () => {
                         <div className="card border-primary" style={{ width: "100%" }}>
                             <div className="card-body">
                                 <form onSubmit={handleSubmit}>
-                                    <textarea name="question" onChange={handleChange} placeholder='Feedback For Us' className='form-control' id="" rows={3}></textarea>
+                                    <textarea name="question" onChange={handleChange} placeholder='Feedback For Us' className='form-control' rows={3}></textarea>
                                     <button type='submit' style={{ backgroundColor: "#0f0e47" }} className='btn text-white mt-3'>Submit</button>
                                 </form>
                             </div>
@@ -56,6 +62,7 @@ const ContactUs = () => {
                     </div>
                 </div>
             </div>
+
             <div className="container pt-3">
                 <div className="card border-primary">
                     <div className="card-body">

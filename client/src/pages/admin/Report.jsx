@@ -6,7 +6,7 @@ const Reportgeneration = () => {
 
   const handlefetch = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/exams/report');
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/exams/report`);
       setData(res.data);
     } catch (er) {
       alert("Sorry, fetching reports failed");
@@ -60,53 +60,53 @@ const Reportgeneration = () => {
       style={{ width: "95%", maxWidth: "1300px", borderRadius: "12px" }}
     >
       <div className="card-body">
-        <div className="row">
-          <div className="col-sm-12">
-            <h3 className="fw-bold text-dark">Report Generation</h3>
-          </div>
-        </div>
-        <div className="row mt-3">
-          <div className="col-sm-12">
-            <table className="table table-bordered table-hover text-center">
-              <thead className="table-primary">
-                <tr>
-                  <th>S.No.</th>
-                  <th>Exam Name</th>
-                  <th>Examinee</th>
-                  <th>Examinee Email</th>
-                  <th>Total Marks</th>
-                  <th>Passing Marks</th>
-                  <th>Score</th>
-                  <th>Status</th>
-                  <th>Date Of Exam</th>
-                  <th>Action</th>
+        <h3 className="fw-bold text-dark">Report Generation</h3>
+
+        <div className="table-responsive mt-3">
+          <table className="table table-bordered table-hover text-center">
+            <thead className="table-primary">
+              <tr>
+                <th>S.No.</th>
+                <th>Exam Name</th>
+                <th>Examinee</th>
+                <th>Examinee Email</th>
+                <th>Total Marks</th>
+                <th>Passing Marks</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Date Of Exam</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((item, i) => (
+                <tr key={item._id}>
+                  <td>{i + 1}</td>
+                  <td>{item.examTitle}</td>
+                  <td>{item.examineeName}</td>
+                  <td>{item.examineeEmail}</td>
+                  <td>{item.totalMarks}</td>
+                  <td>{item.passingMarks}</td>
+                  <td>{item.score}</td>
+                  <td>{item.status}</td>
+                  <td>{new Date(item.attemptedAt).toLocaleString()}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => handlePrint(item)}
+                    >
+                      Print
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {data.map((item, i) => (
-                  <tr key={item._id}>
-                    <td>{i + 1}</td>
-                    <td>{item.examTitle}</td>
-                    <td>{item.examineeName}</td>
-                    <td>{item.examineeEmail}</td>
-                    <td>{item.totalMarks}</td>
-                    <td>{item.passingMarks}</td>
-                    <td>{item.score}</td>
-                    <td>{item.status}</td>
-                    <td>{new Date(item.attemptedAt).toLocaleString()}</td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-primary"
-                        onClick={() => handlePrint(item)}
-                      >
-                        Print
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+              {data.length === 0 && (
+                <tr>
+                  <td colSpan="10">No reports found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

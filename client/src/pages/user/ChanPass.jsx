@@ -15,7 +15,7 @@ const ChanPass = () => {
     }
     const handleSubmit = async(e)=>{
         e.preventDefault();
-        const res = await axios.put(`http://localhost:5000/api/examinee/change/${userId}`,data)
+        const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/examinee/change/${userId}`,data)
         console.log(res)
        try{
          if(res){

@@ -10,7 +10,7 @@ const ExamResultsDeclaration = () => {
     setLoading(true);
     setMessage(null);
     try {
-      const response = await axios.post(`http://localhost:5000/api/exams/result/${examResultId}`);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/exams/result/${examResultId}`);
       setMessage({ type: 'success', text: response.data.message });
 
       // Refresh table after declaring
@@ -24,7 +24,7 @@ const ExamResultsDeclaration = () => {
 
   const handlefetch = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/exams/examination');
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/exams/examination`);
       setData(Array.isArray(res.data.message) ? res.data.message : []);
     } catch (err) {
       console.error("Error fetching pending results:", err);
