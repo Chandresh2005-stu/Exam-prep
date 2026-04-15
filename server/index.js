@@ -5,22 +5,15 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ CORS FIX
+// ✅ FINAL CORS (no more errors)
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || origin.includes("vercel.app")) {
-      callback(null, true);
-    } else {
-      callback(null, false);
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: true,        // allow all origins dynamically
   credentials: true
 }));
 
 app.use(express.json());
 
-// ✅ MongoDB
+// ✅ MongoDB connection
 const URL = process.env.MONGO_URI;
 
 mongoose.connect(URL)
