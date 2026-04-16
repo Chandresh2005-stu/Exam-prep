@@ -1,47 +1,69 @@
-import React from 'react'
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const Session = () => {
+
+    // ✅ FIX 1: name → title
     const [form, setForm] = useState({
-        name: '',
+        title: '',
         description: ''
     });
 
     const [data, setData] = useState([]);
 
+    const [editForm, setEditForm] = useState(false);
+    const [id, setId] = useState('');
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm((prev) => (
-            { ...prev, [name]: value }
-        ));
+        setForm((prev) => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             if (editForm) {
-                const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/session/${id.id}`, form);
+                // ✅ FIX 2: id direct use
+                const res = await axios.put(
+                    `${import.meta.env.VITE_API_URL}/api/session/${id}`,
+                    form
+                );
                 if (res) {
                     alert('Session Updated Successfully');
+                    setEditForm(false);
+                    setForm({ title: '', description: '' });
                     handlefetch();
                 }
             } else {
-                const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/session`, form);
+                const res = await axios.post(
+                    `${import.meta.env.VITE_API_URL}/api/session`,
+                    form
+                );
                 if (res) {
                     alert('Session Added Successfully');
+                    setForm({ title: '', description: '' });
                     handlefetch();
                 }
             }
-        }
-        catch (er) {
+        } catch (er) {
+            console.error(er);
             alert("Sorry Try Again Later");
         }
     };
 
     const handlefetch = async () => {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/session`);
-        setData(res.data.data);
+        try {
+            const res = await axios.get(
+                `${import.meta.env.VITE_API_URL}/api/session`
+            );
+            // ✅ FIX 3: safe data handling
+            setData(res.data.data || res.data);
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
     };
 
     useEffect(() => {
@@ -49,34 +71,75 @@ const Session = () => {
     }, []);
 
     const handleDelete = async (id) => {
-        const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/session/${id}`);
-        if (res) {
-            alert("Deleted Successfully");
-        } else {
-            alert("Try again later");
+        try {
+            const res = await axios.delete(
+                `${import.meta.env.VITE_API_URL}/api/session/${id}`
+            );
+            if (res) {
+                alert("Deleted Successfully");
+                handlefetch();
+            }
+        } catch (error) {
+            console.error(error);
         }
-        handlefetch();
     };
 
-    const [editForm, setEditForm] = useState(null);
-    const [id, setId] = useState({ id: '' });
-
-    const handleEdit = async (item) => {
+    const handleEdit = (item) => {
+        // ✅ FIX 4: name → title
         setForm({
-            name: item.name,
+            title: item.title,
             description: item.description
         });
-        setId({
-            id: item._id
-        });
+        setId(item._id);
         setEditForm(true);
     };
 
+    // ✅ FIX 5: ACTUAL UI (you were missing this)
     return (
         <div>
-            {/* UI same as before */}
-        </div>
-    )
-}
+            <h2>Session Management</h2>
 
-export default Session
+            {/* FORM */}
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    name="title"
+                    placeholder="Enter Title"
+                    value={form.title}
+                    onChange={handleChange}
+                />
+
+                <input
+                    type="text"
+                    name="description"
+                    placeholder="Enter Description"
+                    value={form.description}
+                    onChange={handleChange}
+                />
+
+                <button type="submit">
+                    {editForm ? "Update" : "Add"} Session
+                </button>
+            </form>
+
+            <hr />
+
+            {/* DATA LIST */}
+            {data.length > 0 ? (
+                data.map((item) => (
+                    <div key={item._id}>
+                        <h3>{item.title}</h3>
+                        <p>{item.description}</p>
+
+                        <button onClick={() => handleEdit(item)}>Edit</button>
+                        <button onClick={() => handleDelete(item._id)}>Delete</button>
+                    </div>
+                ))
+            ) : (
+                <p>No Sessions Found</p>
+            )}
+        </div>
+    );
+};
+
+export default Session;
