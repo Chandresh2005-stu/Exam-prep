@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const Session = () => {
+
+    // ✅ FIX 1: name → title
     const [form, setForm] = useState({
-        name: '',
+        title: '',
         description: ''
     });
 
@@ -21,7 +23,8 @@ const Session = () => {
         e.preventDefault();
         try {
             if (editForm) {
-                const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/session/${id.id}`, form);
+                // ✅ FIX 2: id.id → id
+                const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/session/${id}`, form);
                 if (res) {
                     alert('Session Updated Successfully');
                     handlefetch();
@@ -35,13 +38,19 @@ const Session = () => {
             }
         }
         catch (er) {
+            console.error(er);
             alert("Sorry Try Again Later");
         }
     };
 
     const handlefetch = async () => {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/session`);
-        setData(res.data.data);
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/session`);
+            // ✅ FIX 3: safe handling
+            setData(res.data.data || res.data);
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
     };
 
     useEffect(() => {
@@ -49,34 +58,45 @@ const Session = () => {
     }, []);
 
     const handleDelete = async (id) => {
-        const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/session/${id}`);
-        if (res) {
-            alert("Deleted Successfully");
-        } else {
-            alert("Try again later");
+        try {
+            const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/session/${id}`);
+            if (res) {
+                alert("Deleted Successfully");
+            }
+            handlefetch();
+        } catch (error) {
+            console.error(error);
         }
-        handlefetch();
     };
 
-    const [editForm, setEditForm] = useState(null);
-    const [id, setId] = useState({ id: '' });
+    const [editForm, setEditForm] = useState(false);
+    const [id, setId] = useState('');
 
     const handleEdit = async (item) => {
+        // ✅ FIX 4: name → title
         setForm({
-            name: item.name,
+            title: item.title,
             description: item.description
         });
-        setId({
-            id: item._id
-        });
+
+        // ✅ FIX 5: store id directly
+        setId(item._id);
+
         setEditForm(true);
     };
 
     return (
         <div>
-            {/* UI same as before */}
+            {/* ✅ YOUR OLD UI REMAINS SAME — JUST UPDATE FIELD USAGE BELOW */}
+
+            {/* ⚠️ IMPORTANT:
+               Wherever you are using:
+               item.name  → change to item.title
+               form.name  → change to form.title
+            */}
+
         </div>
     )
 }
 
-export default Session
+export default Session;
