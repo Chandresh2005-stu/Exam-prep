@@ -123,7 +123,7 @@ const Session = () => {
                       <td>{item.description}</td>
                       <td>{item.createdAt}</td>
                       <td>
-                        <button className='btn btn-danger' onClick={()=>{
+                        <button onClick={()=>{
                           handleDelete(item._id)
                         }}>Delete</button>
 
